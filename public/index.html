@@ -4,59 +4,126 @@
     <meta charset="UTF-8" />
     <title>Notícias em Destaque - TJRS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 30px auto;
-        padding: 0 15px;
-        background: #f5f5f5;
+      /* ===== Reset básico ===== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #eef1f5;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 900px;
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
       h1 {
         text-align: center;
-      }
-      .info {
-        font-size: 0.9rem;
-        color: #555;
         margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
       }
-      ul {
-        list-style: disc;
-        padding-left: 20px;
-        background: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      .info {
+        text-align: center;
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
       }
-      li {
-        margin-bottom: 8px;
-      }
-      .erro {
-        color: red;
-        font-weight: bold;
-      }
+
       button {
-        margin-bottom: 15px;
-        padding: 8px 12px;
+        display: inline-block;
+        background: #0a66c2;
+        color: white;
+        padding: 10px 18px;
         border-radius: 6px;
         border: none;
         cursor: pointer;
+        font-size: 1rem;
+        transition: 0.2s;
+        margin-bottom: 20px;
+      }
+
+      button:hover {
+        background: #084c95;
+      }
+
+      #status {
+        font-size: 0.95rem;
+        color: #444;
+        margin-bottom: 15px;
+      }
+
+      .erro {
+        color: #d72638;
+        font-weight: bold;
+      }
+
+      /* ===== Lista de notícias ===== */
+      .lista {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .card-noticia {
+        background: #fafafa;
+        padding: 15px 20px;
+        border-left: 5px solid #0a66c2;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        font-size: 1rem;
+        color: #333;
+        transition: 0.25s ease;
+        animation: fadeIn 0.4s ease;
+      }
+
+      .card-noticia:hover {
+        transform: translateX(6px);
+        background: #f0f6ff;
       }
     </style>
+
   </head>
   <body>
-    <h1>Notícias em Destaque - TJRS</h1>
+    <div class="container">
+      <h1>Notícias em Destaque - TJRS</h1>
+      <p class="info">
+        Esta página busca automaticamente os títulos exibidos no carrossel
+        principal da página inicial do TJRS.
+      </p>
 
-    <p class="info">
-      Esta página busca automaticamente os títulos exibidos no carrossel de
-      destaques da página inicial do TJRS.
-    </p>
+      <button id="btnAtualizar">🔄 Atualizar agora</button>
 
-    <button id="btnAtualizar">🔄 Atualizar agora</button>
+      <p id="status"></p>
 
-    <p id="status"></p>
-
-    <ul id="listaNoticias"></ul>
+      <div id="listaNoticias" class="lista"></div>
+    </div>
 
     <script>
       async function carregarNoticias() {
@@ -68,9 +135,7 @@
 
         try {
           const resp = await fetch("/api/noticias-destaque");
-          if (!resp.ok) {
-            throw new Error("Erro HTTP: " + resp.status);
-          }
+          if (!resp.ok) throw new Error("Erro HTTP: " + resp.status);
 
           const data = await resp.json();
 
@@ -83,12 +148,13 @@
           status.textContent =
             "Última atualização: " +
             new Date(data.atualizadoEm).toLocaleString("pt-BR") +
-            ` | Total: ${data.quantidade}`;
+            ` — ${data.quantidade} notícias`;
 
           data.noticias.forEach((item) => {
-            const li = document.createElement("li");
-            li.textContent = item.titulo;
-            lista.appendChild(li);
+            const card = document.createElement("div");
+            card.className = "card-noticia";
+            card.textContent = item.titulo;
+            lista.appendChild(card);
           });
         } catch (err) {
           console.error(err);
@@ -97,11 +163,9 @@
         }
       }
 
-      document
-        .getElementById("btnAtualizar")
+      document.getElementById("btnAtualizar")
         .addEventListener("click", carregarNoticias);
 
-      // Carrega automaticamente ao abrir a página
       carregarNoticias();
     </script>
   </body>
