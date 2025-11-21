@@ -1,0 +1,16 @@
+{
+  "name": "tjrs-noticias",
+  "version": "1.0.0",
+  "description": "Projeto que coleta automaticamente as notícias em destaque do site do TJRS.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.1.0",
+    "express": "^5.1.0"
+  }
+}

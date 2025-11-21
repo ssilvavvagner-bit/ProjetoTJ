@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Notícias em Destaque - TJRS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 0 15px;
+        background: #f5f5f5;
+      }
+      h1 {
+        text-align: center;
+      }
+      .info {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 10px;
+      }
+      ul {
+        list-style: disc;
+        padding-left: 20px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      .erro {
+        color: red;
+        font-weight: bold;
+      }
+      button {
+        margin-bottom: 15px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Notícias em Destaque - TJRS</h1>
+
+    <p class="info">
+      Esta página busca automaticamente os títulos exibidos no carrossel de
+      destaques da página inicial do TJRS.
+    </p>
+
+    <button id="btnAtualizar">🔄 Atualizar agora</button>
+
+    <p id="status"></p>
+
+    <ul id="listaNoticias"></ul>
+
+    <script>
+      async function carregarNoticias() {
+        const status = document.getElementById("status");
+        const lista = document.getElementById("listaNoticias");
+
+        status.textContent = "Carregando notícias...";
+        lista.innerHTML = "";
+
+        try {
+          const resp = await fetch("/api/noticias-destaque");
+          if (!resp.ok) {
+            throw new Error("Erro HTTP: " + resp.status);
+          }
+
+          const data = await resp.json();
+
+          if (!data.noticias || data.noticias.length === 0) {
+            status.innerHTML =
+              '<span class="erro">Nenhuma notícia encontrada. Talvez o layout do site tenha mudado.</span>';
+            return;
+          }
+
+          status.textContent =
+            "Última atualização: " +
+            new Date(data.atualizadoEm).toLocaleString("pt-BR") +
+            ` | Total: ${data.quantidade}`;
+
+          data.noticias.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item.titulo;
+            lista.appendChild(li);
+          });
+        } catch (err) {
+          console.error(err);
+          status.innerHTML =
+            '<span class="erro">Erro ao carregar notícias. Veja o console para detalhes.</span>';
+        }
+      }
+
+      document
+        .getElementById("btnAtualizar")
+        .addEventListener("click", carregarNoticias);
+
+      // Carrega automaticamente ao abrir a página
+      carregarNoticias();
+    </script>
+  </body>
+</html>
